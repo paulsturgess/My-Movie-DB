@@ -1,0 +1,17 @@
+<h1>Search results</h1>
+
+<% if @results.empty? %>
+	
+	<p>No movies were found.</p>
+	
+<% else %>
+	
+	<ul>
+		<% @results.each do |movie| %>		
+			<li>
+				<%= movie.inspect %>
+			</li>		
+		<% end %>
+	</ul>
+	
+<% end %>

@@ -1,15 +1,17 @@
 <h1>Search results</h1>
 
-<% if @results.empty? %>
+<% if @movies.empty? %>
 	
 	<p>No movies were found.</p>
 	
 <% else %>
 	
 	<ul>
-		<% @results.each do |movie| %>		
+		<% @movies.each do |movie| %>		
+			<% result_url = "/result?tmdb_id=#{movie.tmdb_id}" %>
 			<li>
-				<%= movie.inspect %>
+				<h2><a href="<%= result_url %>"><%= h movie %><span><%= movie.year %></span></a></h2>
+				<a href="<%= result_url %>"><img src="<%= h movie.thumb_url %>" alt="<%= "#{movie} cover thumbnail" %>"></a>
 			</li>		
 		<% end %>
 	</ul>

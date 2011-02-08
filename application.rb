@@ -18,16 +18,18 @@ class IndexTankClient
   
   def add(movie)
     attrs = movie.attributes
-    attrs.merge!({:timestamp => Time.now.to_i, :match => "all"})
+    attrs.merge!({:timestamp => Time.now.to_i, :all => "true"})
     @index.document(movie.tmdb_id).add(attrs)
   end
   
-  def search(query, method = :name)
+  def search(method = :name, query = nil)
     search_terms = case method
     when :imdb_id
       "imdb_id:#{query}"
     when :name
       "name:#{query}"
+    when :all
+      "all:true"
     else
       raise IndexTankApiMethodNotImplemented
     end
@@ -35,7 +37,11 @@ class IndexTankClient
   end
   
   def load(imdb_id)
-    search(imdb_id, :imdb_id).first
+    search(:imdb_id, imdb_id).first
+  end
+  
+  def all
+    search(:all)
   end
   
 end
@@ -57,10 +63,6 @@ class Tmdb
   
   def self.send_request(http_method, api_method, params)
     path = case api_method
-    when :search
-      "Movie.search"
-    when :get_info
-      "Movie.getInfo"
     when :imdb_lookup
       "Movie.imdbLookup"
     else
@@ -69,21 +71,7 @@ class Tmdb
     
     send(http_method, "#{self.api_url}#{path}/en/xml/#{self.api_key}/#{params}")["OpenSearchDescription"]["movies"]["movie"]
   end
-  
-  # def search(query)
-  #   raise ArgumentError if query.blank?
-  #   results = send_request(:get, :search, url_encode(query))
-  #   movies = []
-  #   results.each do |result|
-  #     movies << Movie.new(result)
-  #   end
-  #   movies
-  # end
-  # 
-  # def get_info(tmdb_id)
-  #   send_request(:get, :get_info, tmdb_id)
-  # end
-  
+
   def self.imdb_lookup(imdb_id)
     self.send_request(:get, :imdb_lookup, imdb_id)
   end
@@ -103,6 +91,13 @@ class Movie
   def initialize(attrs = {})
     self.class.attributes.each do |attribute|
       self.send("#{attribute}=", attrs[attribute.to_s])
+    end
+  end
+  
+  def self.all
+    documents = IndexTankClient.new.all
+    documents.inject([]) do |movies, document|
+      movies << Movie.convert_from_index_tank(document)
     end
   end
   
@@ -135,10 +130,10 @@ class Movie
   # Search for movies in the Index Tank store and
   # returns them as an array of movie instances
   def self.search(query)
-    documents = query ? IndexTankClient.new.search(query, :name) : [] #hardcoded to name for now
+    documents = query ? IndexTankClient.new.search(:name, query) : [] #hardcoded to name for now
     documents.inject([]) do |movies, document|
       movies << Movie.convert_from_index_tank(document)
-    end    
+    end
   end
   
   def self.load(imdb_id)
@@ -177,6 +172,12 @@ end
 get '/results' do
   response.headers['Cache-Control'] = 'public, max-age=31556926'
   @movies = Movie.search(params[:search_query])
+  redirect "/movie/#{@movies.first.imdb_id}" if @movies.length == 1
+  erb :results
+end
+
+get '/all' do
+  @movies = Movie.all
   erb :results
 end
 

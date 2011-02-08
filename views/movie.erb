@@ -1,8 +1,4 @@
-<h1>Search result</h1>
-
-<p><a href="/results?query=<%= session[:search_query] %>">Return to results</a></p>
-
-<h2><%= @movie %></h2>
+<h1><%= @movie %></h1>
 
 <dl>
 	<dt>Year</dt>
@@ -13,11 +9,12 @@
 	<dd><%= @movie.certification %></dd>
 	<dt>Language</dt>
 	<dd><%= @movie.language %></dd>
-	<dt>Director</dt>
-	<dd><%= @movie.director %></dd>
-	
+	<dt>Genres</dt>
+	<dd><%= @movie.genres %></dd>
 </dl>
 
 <p><%= h @movie.overview %></p>
 
 <img src="<%= @movie.cover_url %>" alt="<%= "#{@movie} artwork" %>" />
+
+<a href="http://imdb.com/title/<%= @movie.imdb_id %>">View on IMDb</a>

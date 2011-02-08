@@ -8,7 +8,7 @@
 	
 	<ul>
 		<% @movies.each do |movie| %>		
-			<% result_url = "/result?tmdb_id=#{movie.tmdb_id}" %>
+			<% result_url = "/movie/#{movie.tmdb_id}" %>
 			<li>
 				<h2><a href="<%= result_url %>"><%= h movie %><span><%= movie.year %></span></a></h2>
 				<a href="<%= result_url %>"><img src="<%= h movie.thumb_url %>" alt="<%= "#{movie} cover thumbnail" %>"></a>

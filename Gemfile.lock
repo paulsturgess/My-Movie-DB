@@ -1,0 +1,46 @@
+GEM
+  specs:
+    activemodel (3.0.0)
+      activesupport (= 3.0.0)
+      builder (~> 2.1.2)
+      i18n (~> 0.4.1)
+    activerecord (3.0.0)
+      activemodel (= 3.0.0)
+      activesupport (= 3.0.0)
+      arel (~> 1.0.0)
+      tzinfo (~> 0.3.23)
+    activesupport (3.0.0)
+    addressable (2.2.2)
+    arel (1.0.1)
+      activesupport (~> 3.0.0)
+    builder (2.1.2)
+    crack (0.1.8)
+    faraday (0.5.4)
+      addressable (~> 2.2.2)
+      multipart-post (~> 1.1.0)
+      rack (>= 1.1.0, < 2)
+    httparty (0.6.1)
+      crack (= 0.1.8)
+    i18n (0.4.1)
+    indextank (1.0.7)
+      faraday
+      json_pure (>= 1.4.6)
+      yajl-ruby (>= 0.7.7)
+    json_pure (1.4.6)
+    multipart-post (1.1.0)
+    rack (1.2.1)
+    sinatra (1.1.2)
+      rack (~> 1.1)
+      tilt (~> 1.2)
+    tilt (1.2.2)
+    tzinfo (0.3.23)
+    yajl-ruby (0.7.9)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activerecord (= 3.0.0)
+  httparty (= 0.6.1)
+  indextank (= 1.0.7)
+  sinatra (= 1.1.2)

@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'sinatra'
 require 'httparty'
 require 'active_record'

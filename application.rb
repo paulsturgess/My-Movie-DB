@@ -18,14 +18,14 @@ class IndexTankClient
   
   def add(movie)
     attrs = movie.attributes
-    attrs.merge!({:timestamp => Time.now.to_i})
+    attrs.merge!({:timestamp => Time.now.to_i, :match => "all"})
     @index.document(movie.tmdb_id).add(attrs)
   end
   
   def search(query, method = :name)
     search_terms = case method
-    when :tmdb_id
-      "tmdb_id:#{query}"
+    when :imdb_id
+      "imdb_id:#{query}"
     when :name
       "name:#{query}"
     else
@@ -34,28 +34,28 @@ class IndexTankClient
     @index.search(search_terms, :fetch => Movie.new.attributes.keys.join(",") )["results"]
   end
   
-  def load(tmdb_id)
-    search(tmdb_id, :tmdb_id).first
+  def load(imdb_id)
+    search(imdb_id, :imdb_id).first
   end
   
 end
 
-module Tmdb
+class Tmdb
   
   include HTTParty
   
   class Error < RuntimeError; end
   class TmdbApiMethodNotImplemented < Error; end
   
-  def api_url
+  def self.api_url
     "http://api.themoviedb.org/2.1/"
   end
   
-  def api_key
+  def self.api_key
     "c54eff606fc1f4e27314d565c36c68fc"
   end
   
-  def send_request(http_method, api_method, params)
+  def self.send_request(http_method, api_method, params)
     path = case api_method
     when :search
       "Movie.search"
@@ -67,7 +67,7 @@ module Tmdb
       raise TmdbApiMethodNotImplemented
     end
     
-    send(http_method, "#{self.class.api_url}#{path}/en/xml/#{api_key}/#{params}")["OpenSearchDescription"]["movies"]["movie"]
+    send(http_method, "#{self.api_url}#{path}/en/xml/#{self.api_key}/#{params}")["OpenSearchDescription"]["movies"]["movie"]
   end
   
   # def search(query)
@@ -84,8 +84,8 @@ module Tmdb
   #   send_request(:get, :get_info, tmdb_id)
   # end
   
-  def imdb_lookup(imdb_id)
-    send_request(:get, :imdb_lookup, imdb_id)
+  def self.imdb_lookup(imdb_id)
+    self.send_request(:get, :imdb_lookup, imdb_id)
   end
   
 end
@@ -116,7 +116,7 @@ class Movie
   # Grabs the movie data from TMDB api and loads
   # the attributes into a movie instance
   def self.load_from_imdb_id(imdb_id) 
-    attrs = Tmdb::imdb_lookup(imdb_id)
+    attrs = Tmdb.imdb_lookup(imdb_id)
     movie = Movie.new 
     movie.name = attrs["name"]
     movie.overview = attrs["overview"]
@@ -129,6 +129,7 @@ class Movie
     movie.duration = attrs["runtime"] rescue nil
     movie.certification = attrs["certification"] rescue nil
     movie.genres = attrs["categories"]["category"].map{ |c| c["name"] }.sort.join(", ") rescue nil
+    movie
   end
   
   # Search for movies in the Index Tank store and
@@ -140,8 +141,8 @@ class Movie
     end    
   end
   
-  def self.load(tmbd_id)
-    document = IndexTankClient.new.load(tmbd_id)
+  def self.load(imdb_id)
+    document = IndexTankClient.new.load(imdb_id)
     Movie.convert_from_index_tank(document)
   end
   
@@ -153,7 +154,6 @@ class Movie
   def to_s
     name
   end
-  
   
   def attributes
     attrs = {}
@@ -180,9 +180,9 @@ get '/results' do
   erb :results
 end
 
-get '/movie/:tmdb_id' do
+get '/movie/:imdb_id' do
   response.headers['Cache-Control'] = 'public, max-age=31556926'
-  @movie = Movie.load(params[:tmdb_id])
+  @movie = Movie.load(params[:imdb_id])
   erb :movie
 end
 
@@ -192,6 +192,7 @@ get '/add' do
 end
 
 post '/create' do
-  Movie.add!(params[:imdb_id])
-  redirect "/"
+  movie = Movie.add!(params[:imdb_id])
+  redirect_url = movie ? "/movie/#{params[:imdb_id]}" : "/add"
+  redirect redirect_url
 end

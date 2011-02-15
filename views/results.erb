@@ -1,5 +1,14 @@
 <h1>Search results</h1>
 
+<ul>
+	<% Search.attributes.each do |attribute| %>
+		<% value = @search.send(attribute) %>
+		<% unless value.blank? %>
+			<li><%= attribute %>: <%= @search.send(attribute) %></li>
+		<% end %>
+	<% end %>
+</ul>
+
 <% if @movies.empty? %>
 	
 	<p>No movies were found.</p>

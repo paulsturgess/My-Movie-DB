@@ -1,7 +1,16 @@
 <h1>My Movie DB</h1>
 
 <form method="get" action="/results">
-	<label for="search_query">Search</label>
-	<input type="text" name="search_query" />
+	<label for="search_name">Name:</label>
+	<input type="text" name="search[name]" id="search_name" />
+	<label for="search_year">Year</label>
+	<input type="text" name="search[year]" id="search_year" />
+	<label for="search_genre">Genre</label>
+	<select id="search_genre" name="search[genre]">
+		<option value=""></option>
+		<% @genres.each do |genre| %>
+			<option value="<%= genre %>"><%= genre %></option>
+		<% end %>
+	</select>
 	<input type="submit" />
 </form>

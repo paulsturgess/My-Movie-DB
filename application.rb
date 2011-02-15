@@ -6,6 +6,44 @@ include ERB::Util # Make url encode methods available
 
 set :sessions, true # Support for encrypted, cookie-based sessions
 
+class Search
+  
+  def self.attributes 
+    [:year, :name, :imdb_id, :genre, :all]
+  end
+  
+  self.attributes.each do |attribute|
+    attr_accessor attribute
+  end
+  
+  def initialize(attrs = {})
+    self.class.attributes.each do |attribute|
+      self.send("#{attribute}=", attrs[attribute.to_s])
+    end
+  end
+  
+  def conditions
+    conditions = []
+    conditions << "year:#{year}" if year.present?
+    conditions << "name:#{name}" if name.present?
+    conditions << "imdb_id:#{imdb_id}" if imdb_id.present?
+    conditions << "genres:#{genre}" if genre.present?
+    conditions = ["all:true"] if all.present? || conditions.empty?
+    conditions.join(" ")
+  end
+  
+  # Search for movies in the Index Tank store and
+  # returns them as an array of movie instances
+  def results
+    documents = conditions.present? ? IndexTankClient.new.search(conditions) : []
+    documents.inject([]) do |movies, document|
+      movies << Movie.convert_from_index_tank(document)
+    end
+  end
+  
+end
+
+
 class IndexTankClient
   
   class Error < RuntimeError; end
@@ -22,26 +60,8 @@ class IndexTankClient
     @index.document(movie.tmdb_id).add(attrs)
   end
   
-  def search(method = :name, query = nil)
-    search_terms = case method
-    when :imdb_id
-      "imdb_id:#{query}"
-    when :name
-      "name:#{query}"
-    when :all
-      "all:true"
-    else
-      raise IndexTankApiMethodNotImplemented
-    end
-    @index.search(search_terms, :fetch => Movie.new.attributes.keys.join(",") )["results"]
-  end
-  
-  def load(imdb_id)
-    search(:imdb_id, imdb_id).first
-  end
-  
-  def all
-    search(:all)
+  def search(conditions)
+    @index.search(conditions, :fetch => Movie.new.attributes.keys.join(",") )["results"]
   end
   
 end
@@ -94,13 +114,6 @@ class Movie
     end
   end
   
-  def self.all
-    documents = IndexTankClient.new.all
-    documents.inject([]) do |movies, document|
-      movies << Movie.convert_from_index_tank(document)
-    end
-  end
-  
   # Grabs movie data from the TMDB api and saves it into the Index Tank store
   def self.add!(imdb_id)
     return false unless imdb_id
@@ -127,20 +140,6 @@ class Movie
     movie
   end
   
-  # Search for movies in the Index Tank store and
-  # returns them as an array of movie instances
-  def self.search(query)
-    documents = query ? IndexTankClient.new.search(:name, query) : [] #hardcoded to name for now
-    documents.inject([]) do |movies, document|
-      movies << Movie.convert_from_index_tank(document)
-    end
-  end
-  
-  def self.load(imdb_id)
-    document = IndexTankClient.new.load(imdb_id)
-    Movie.convert_from_index_tank(document)
-  end
-  
   # Convert an index tank document into a movie instance
   def self.convert_from_index_tank(document)
     Movie.new(document)
@@ -159,31 +158,33 @@ class Movie
   end
   
   def self.genres
-    ["Action", "Adventure", "Animation", "Comedy", "Crime", "Disaster", "Documentary", "Drama", "Eastern", "Family", "Fantasy", "History", "Holiday", "Horror", "Musical", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western"]
+    ["Action", "Adventure", "Animation", "Comedy", "Crime", "Disaster", "Documentary", "Drama", "Eastern", "Family", "Fantasy", "History", "Holiday", "Horror", "Musical", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western"].sort
   end
   
 end
 
 get '/' do
   response.headers['Cache-Control'] = 'public, max-age=31556926'
+  @genres = Movie.genres
   erb :index
 end
 
 get '/results' do
   response.headers['Cache-Control'] = 'public, max-age=31556926'
-  @movies = Movie.search(params[:search_query])
+  @search = Search.new(params[:search])
+  @movies = @search.results
   redirect "/movie/#{@movies.first.imdb_id}" if @movies.length == 1
   erb :results
 end
 
 get '/all' do
-  @movies = Movie.all
+  @movies = Search.new("all" => true).results
   erb :results
 end
 
 get '/movie/:imdb_id' do
   response.headers['Cache-Control'] = 'public, max-age=31556926'
-  @movie = Movie.load(params[:imdb_id])
+  @movie = Search.new("imdb_id" => params[:imdb_id]).results.first
   erb :movie
 end
 

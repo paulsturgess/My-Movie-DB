@@ -9,7 +9,7 @@ set :sessions, true # Support for encrypted, cookie-based sessions
 class Search
   
   def self.attributes 
-    [:year, :name, :imdb_id, :genre, :all]
+    [:year, :name, :imdb_id, :genre, :all, :duration]
   end
   
   self.attributes.each do |attribute|
@@ -32,10 +32,14 @@ class Search
     conditions.join(" ")
   end
   
+  def variables
+    duration.present? ? {:docvar_filters => {0 => [[0,duration]]}} : {}
+  end
+  
   # Search for movies in the Index Tank store and
   # returns them as an array of movie instances
   def results
-    documents = conditions.present? ? IndexTankClient.new.search(conditions) : []
+    documents = [conditions, variables].any?(&:present?) ? IndexTankClient.new.search(conditions, variables) : []
     documents.inject([]) do |movies, document|
       movies << Movie.convert_from_index_tank(document)
     end
@@ -57,11 +61,11 @@ class IndexTankClient
   def add(movie)
     attrs = movie.attributes
     attrs.merge!({:timestamp => Time.now.to_i, :all => "true"})
-    @index.document(movie.tmdb_id).add(attrs)
+    @index.document(movie.tmdb_id).add(attrs, :variables => {0 => movie.duration})
   end
   
-  def search(conditions)
-    @index.search(conditions, :fetch => Movie.new.attributes.keys.join(",") )["results"]
+  def search(conditions, variables = nil)
+    @index.search(conditions, {:fetch => Movie.new.attributes.keys.join(",")}.merge!(variables) )["results"]
   end
   
 end

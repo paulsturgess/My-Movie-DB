@@ -174,7 +174,6 @@ get '/' do
 end
 
 get '/results' do
-  response.headers['Cache-Control'] = 'public, max-age=31556926'
   @search = Search.new(params[:search])
   @movies = @search.results
   redirect "/movie/#{@movies.first.imdb_id}" if @movies.length == 1
@@ -182,7 +181,8 @@ get '/results' do
 end
 
 get '/all' do
-  @movies = Search.new("all" => true).results
+  @search = Search.new("all" => true)
+  @movies = @search.results
   erb :results
 end
 

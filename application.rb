@@ -131,15 +131,15 @@ class Movie
     attrs = Tmdb.imdb_lookup(imdb_id)
     movie = Movie.new 
     movie.name = attrs["name"]
-    movie.overview = attrs["overview"]
-    movie.language = attrs["language"]
-    movie.cover_url = (attrs["images"]["image"].select{ |img| img["size"] == "cover"  }.first["url"] rescue "")
-    movie.thumb_url = (attrs["images"]["image"].select{ |img| img["size"] == "thumb"  }.first["url"] rescue "")
+    movie.overview = attrs["overview"] || ""
+    movie.language = attrs["language"] || ""
+    movie.cover_url = (attrs["images"]["image"].select{ |img| img["size"] == "cover"  }.first["url"] || "" rescue "")
+    movie.thumb_url = (attrs["images"]["image"].select{ |img| img["size"] == "thumb"  }.first["url"] || "" rescue "")
     movie.year = Time.parse(attrs["released"]).year rescue ""
     movie.tmdb_id = attrs["id"]
     movie.imdb_id = attrs["imdb_id"]
-    movie.duration = attrs["runtime"] rescue ""
-    movie.certification = attrs["certification"] rescue ""
+    movie.duration = attrs["runtime"] || "" rescue ""
+    movie.certification = attrs["certification"] || "" rescue ""
     movie.genres = attrs["categories"]["category"].map{ |c| c["name"] }.sort.join(", ") rescue ""
     movie
   end

@@ -65,7 +65,7 @@ class IndexTankClient
   end
   
   def search(conditions, variables = nil)
-    @index.search(conditions, {:fetch => Movie.new.attributes.keys.join(",")}.merge!(variables) )["results"]
+    @index.search(conditions, {:fetch => Movie.new.attributes.keys.join(","), :len => 999}.merge!(variables) )["results"]
   end
   
 end

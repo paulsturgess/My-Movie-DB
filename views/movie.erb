@@ -1,20 +1,24 @@
 <h1><%= @movie %></h1>
 
-<dl>
-	<dt>Year</dt>
-	<dd><%= h @movie.year %></dd>
-	<dt>Duration</dt>
-	<dd><%= @movie.duration %> mins</dd>
-	<dt>Certification</dt>
-	<dd><%= @movie.certification %></dd>
-	<dt>Language</dt>
-	<dd><%= @movie.language %></dd>
-	<dt>Genres</dt>
-	<dd><%= @movie.genres %></dd>
-</dl>
+<img src="<%= @movie.cover_url %>" alt="<%= "#{@movie} artwork" %>" id="movie_artwork" />
 
-<p><%= h @movie.overview %></p>
 
-<img src="<%= @movie.cover_url %>" alt="<%= "#{@movie} artwork" %>" />
+<div id="details">
+	<p><a href="http://imdb.com/title/<%= @movie.imdb_id %>">View on IMDb &raquo;</a></p>
+	<dl>
+		<dt>Year</dt>
+		<dd><%= h @movie.year %></dd>
+		<dt>Duration</dt>
+		<dd><%= @movie.duration %> mins</dd>
+		<dt>Certification</dt>
+		<dd><%= @movie.certification %></dd>
+		<dt>Language</dt>
+		<dd><%= @movie.language %></dd>
+		<dt>Genres</dt>
+		<dd><%= @movie.genres %></dd>
+	</dl>
+	
+	<h2>Overview</h2>
+	<p><%= h @movie.overview %></p>
 
-<a href="http://imdb.com/title/<%= @movie.imdb_id %>">View on IMDb</a>
+</div><!-- /details -->

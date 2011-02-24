@@ -1,15 +1,19 @@
 *{margin:0; padding:0;}
-body{font: .75em Arial,Helvetica,sans-serif; color: #000;}
+body{font: 1em Arial,Helvetica,sans-serif; color: #000;}
 
 #header_container{width:100%; background:#000; overflow:hidden; height:50px; position:fixed;}
 #header{color:#FFF; width:990px; margin:0 auto;}
-h1{color:#FFF; font-size:1.5em; float:left;}
-form{margin:15px auto 0; width:785px; }
+form{margin:15px auto 0; width:790px; }
 #search_year{width:50px;}
+#search_duration{width:130px;}
 input, select{margin:0 15px 0 0;}
 #search_button{margin:0;}
+label{font-size:0.7em;}
 
 #container{ padding-top:80px; width:990px; margin:0 auto 0; /*background:#EEE;*/ overflow:hidden;}
+
+
+/* search results */
 img{display:block;}
 #search_results{list-style:none;}
 #search_results li{
@@ -19,3 +23,21 @@ img{display:block;}
 	box-shadow: 3px 3px 3px #333;
 	}
 #search_results li img{width:170px;}
+
+
+/* movie details */
+#movie_artwork{
+	display:block; float:right; margin:0 5px 5px 0;
+	-moz-box-shadow: 3px 3px 3px #333;
+	-webkit-box-shadow: 3px 3px 3px #333;
+	box-shadow: 3px 3px 3px #333;
+}
+#details{width:500px;}
+h1{color:#000; font-size:2em; margin:0 0 20px;}
+a, a:link, a:visited{color:#000;}
+a:hover{color:#FFF;background:#000; text-decoration:none;}
+h2{font-size:1.2em; font-weight:normal; margin-bottom:3px;}
+p{margin-bottom:10px;}
+dl{overflow:hidden; margin:0 0 20px;}
+dt{float:left; width:100px; clear:left; margin-bottom:2px;}
+dd{font-weight:bold; float:left; margin-bottom:2px;}

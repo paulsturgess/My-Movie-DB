@@ -192,6 +192,7 @@ end
 
 get '/add' do
   response.headers['Cache-Control'] = 'public, max-age=31556926'
+  load_search
   erb :add
 end
 

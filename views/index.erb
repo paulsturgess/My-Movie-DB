@@ -1,18 +1,19 @@
-<h1>My Movie DB</h1>
-
-<form method="get" action="/results">
-	<label for="search_name">Name:</label>
-	<input type="text" name="search[name]" id="search_name" />
-	<label for="search_year">Year</label>
-	<input type="text" name="search[year]" id="search_year" />
-	<label for="search_duration">Duration</label>
-	<input type="text" name="search[duration]" id="search_duration" />
-	<label for="search_genre">Genre</label>
-	<select id="search_genre" name="search[genre]">
-		<option value=""></option>
-		<% @genres.each do |genre| %>
-			<option value="<%= genre %>"><%= genre %></option>
+<% if @movies.empty? %>
+	
+	<p>No movies were found.</p>
+	
+<% else %>
+	
+	<ul id="search_results">
+		<% @movies.each do |movie| %>		
+			<% result_url = "/movie/#{movie.imdb_id}" %>
+			<li>
+				<div class="details" style="display:none;">
+					<h2><a href="<%= result_url %>"><%= h movie %> <span>(<%= movie.year %>)</span></a></h2>
+				</div><!-- /details -->
+				<a href="<%= result_url %>" title="<%= h movie %>" class="image_link"><img src="<%= h movie.cover_url %>" alt="<%= "#{movie} cover artwork" %>" width="170px"></a>
+			</li>		
 		<% end %>
-	</select>
-	<input type="submit" />
-</form>
+	</ul>
+	
+<% end %>

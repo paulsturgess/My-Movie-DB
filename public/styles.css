@@ -1,0 +1,21 @@
+*{margin:0; padding:0;}
+body{font: .75em Arial,Helvetica,sans-serif; color: #000;}
+
+#header_container{width:100%; background:#000; overflow:hidden; height:50px; position:fixed;}
+#header{color:#FFF; width:990px; margin:0 auto;}
+h1{color:#FFF; font-size:1.5em; float:left;}
+form{margin:15px auto 0; width:785px; }
+#search_year{width:50px;}
+input, select{margin:0 15px 0 0;}
+#search_button{margin:0;}
+
+#container{ padding-top:80px; width:990px; margin:0 auto 0; /*background:#EEE;*/ overflow:hidden;}
+img{display:block;}
+#search_results{list-style:none;}
+#search_results li{
+	display:block; float:left; margin:0 35px 40px 35px; overflow:hidden; width:170px; height:230px;
+	-moz-box-shadow: 3px 3px 3px #333;
+	-webkit-box-shadow: 3px 3px 3px #333;
+	box-shadow: 3px 3px 3px #333;
+	}
+#search_results li img{width:170px;}

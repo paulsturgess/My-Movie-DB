@@ -4,8 +4,6 @@ require 'active_record'
 require 'indextank'
 include ERB::Util # Make url encode methods available
 
-set :sessions, true # Support for encrypted, cookie-based sessions
-
 class Search
   
   def self.attributes 
@@ -18,7 +16,7 @@ class Search
   
   def initialize(attrs = {})
     self.class.attributes.each do |attribute|
-      self.send("#{attribute}=", attrs[attribute.to_s])
+      self.send("#{attribute}=", (attrs[attribute.to_s] rescue nil))
     end
   end
   
@@ -40,9 +38,10 @@ class Search
   # returns them as an array of movie instances
   def results
     documents = [conditions, variables].any?(&:present?) ? IndexTankClient.new.search(conditions, variables) : []
-    documents.inject([]) do |movies, document|
+    movie_results = documents.inject([]) do |movies, document|
       movies << Movie.convert_from_index_tank(document)
     end
+    movie_results.sort_by(&:name)
   end
   
 end
@@ -165,29 +164,28 @@ class Movie
     ["Action", "Adventure", "Animation", "Comedy", "Crime", "Disaster", "Documentary", "Drama", "Eastern", "Family", "Fantasy", "History", "Holiday", "Horror", "Musical", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western"].sort
   end
   
+  def self.durations
+    {
+      60 => "1 hour",
+      90 => "1 and a half hours",
+      120 => "2 hours",
+      150 => "2 and a half hours",
+      180 => "3 hours"
+    }
+  end
+  
 end
 
 get '/' do
-  response.headers['Cache-Control'] = 'public, max-age=31556926'
-  @genres = Movie.genres
-  erb :index
-end
-
-get '/results' do
-  @search = Search.new(params[:search])
-  @movies = @search.results
+  #response.headers['Cache-Control'] = 'public, max-age=31556926'
+  load_search
   redirect "/movie/#{@movies.first.imdb_id}" if @movies.length == 1
-  erb :results
-end
-
-get '/all' do
-  @search = Search.new("all" => true)
-  @movies = @search.results
-  erb :results
+  erb :index
 end
 
 get '/movie/:imdb_id' do
   response.headers['Cache-Control'] = 'public, max-age=31556926'
+  load_search
   @movie = Search.new("imdb_id" => params[:imdb_id]).results.first
   erb :movie
 end
@@ -201,4 +199,12 @@ post '/create' do
   movie = Movie.add!(params[:imdb_id])
   redirect_url = movie ? "/movie/#{params[:imdb_id]}" : "/add"
   redirect redirect_url
+end
+
+def load_search
+  @genres = Movie.genres
+  @durations = Movie.durations
+  @search = Search.new(params[:search] || {"all" => true})
+  
+  @movies = @search.results
 end

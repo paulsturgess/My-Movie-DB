@@ -167,10 +167,15 @@ class Movie
   def self.durations
     {
       60 => "1 hour",
-      90 => "1 and a half hours",
+      70 => "1 hour 10 minutes",
+      80 => "1 hour 20 minutes",
+      90 => "1 hour 30 minutes",
+      100 => "1 hour 40 minutes",
+      110 => "1 hour 50 minutes",
       120 => "2 hours",
-      150 => "2 and a half hours",
-      180 => "3 hours"
+      130 => "2 hours 10 minutes",
+      140 => "2 hours 20 minutes",
+      150 => "2 hours 30 minutes"
     }
   end
   

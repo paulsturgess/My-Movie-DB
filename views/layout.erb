@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>My Movie DB</title>
-    <link href="/styles.css" rel="stylesheet" type="text/css"></link>
-  </head>
-  
-  <body>
-		<div id="header_container">
-			<div id="header">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Movie DB</title>
+  <link href="/styles.css" rel="stylesheet" type="text/css"></link>
+</head>
 
-				<form method="get" action="/">
-					<label for="search_name">Name:</label>
-					<input type="text" name="search[name]" id="search_name" value="<%= @search.name %>" />
-					<label for="search_year">Year:</label>
-					<input type="text" name="search[year]" id="search_year" value="<%= @search.year %>" />
-					<label for="search_duration">Duration less than:</label>
-					<select id="search_duration" name="search[duration]">
-						<option value=""></option>
-						<% @durations.keys.sort.each do |mins| %>
-							<% text = @durations[mins] %>
-							<option value="<%= mins %>" <%= "selected='selected'" if mins == @search.duration.to_i %>><%= text %></option>
-						<% end %>
-					</select>
-					<label for="search_genre">Genre:</label>
-					<select id="search_genre" name="search[genre]">
-						<option value=""></option>
-						<% @genres.each do |genre| %>
-							<option value="<%= genre %>" <%= "selected='selected'" if genre == @search.genre %>><%= genre %></option>
-						<% end %>
-					</select>
-					<input type="submit" value="Search" id="search_button" />
-				</form>
-			
-			</div><!-- /header -->
-		</div><!-- /header_container -->
-	
-    <div id="container">
-	
-			
+<body>
+  <div id="header_container">
+    <div id="header">
 
-      <div id="content">
-        <%= yield %>
-      </div>
-      
-    </div><!-- /container -->
-  </body>
+      <form method="get" action="/">
+        <label for="search_name">Name:</label>
+        <input type="text" name="search[name]" id="search_name" value="<%= @search.name %>" />
+        <label for="search_year">Year:</label>
+        <input type="text" name="search[year]" id="search_year" value="<%= @search.year %>" />
+        <label for="search_duration">Duration less than:</label>
+        <select id="search_duration" name="search[duration]">
+          <option value=""></option>
+          <% @durations.keys.sort.each do |mins| %>
+          <% text = @durations[mins] %>
+          <option value="<%= mins %>" <%= "selected='selected'" if mins == @search.duration.to_i %>><%= text %></option>
+          <% end %>
+        </select>
+        <label for="search_genre">Genre:</label>
+        <select id="search_genre" name="search[genre]">
+          <option value=""></option>
+          <% @genres.each do |genre| %>
+          <option value="<%= genre %>" <%= "selected='selected'" if genre == @search.genre %>><%= genre %></option>
+          <% end %>
+        </select>
+        <input type="submit" value="Search" id="search_button" />
+      </form>
+
+    </div><!-- /header -->
+  </div><!-- /header_container -->
+
+  <div id="container">
+
+
+
+    <div id="content">
+      <%= yield %>
+    </div>
+
+  </div><!-- /container -->
+</body>
 </html>

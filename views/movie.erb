@@ -21,4 +21,10 @@
 	<h2>Overview</h2>
 	<p><%= h @movie.overview %></p>
 
+  
+  <form method="post" action="/delete/<%= @movie.imdb_id %>">
+    <input name="_method" type="hidden" value="delete" />
+  	<input type="submit" value="Delete" />
+  </form>
+
 </div><!-- /details -->

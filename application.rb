@@ -63,6 +63,10 @@ class IndexTankClient
     @index.document(movie.tmdb_id).add(attrs, :variables => {0 => movie.duration})
   end
   
+  def delete(movie)
+    @index.document(movie.tmdb_id).delete()
+  end
+  
   def search(conditions, variables = nil)
     @index.search(conditions, {:fetch => Movie.new.attributes.keys.join(","), :len => 999}.merge!(variables) )["results"]
   end
@@ -124,6 +128,10 @@ class Movie
     IndexTankClient.new.add(movie)
   end
   
+  def delete!
+    IndexTankClient.new.delete(self)
+  end
+  
   # Grabs the movie data from TMDB api and loads
   # the attributes into a movie instance
   def self.load_from_imdb_id(imdb_id) 
@@ -155,7 +163,7 @@ class Movie
   def attributes
     attrs = {}
     self.instance_variables.each do |v|
-      attrs[v.gsub("@", "").to_sym] = self.instance_variable_get(v)
+      attrs[v.to_s.gsub("@", "").to_sym] = self.instance_variable_get(v)
     end
     attrs
   end
@@ -182,21 +190,18 @@ class Movie
 end
 
 get '/' do
-  #response.headers['Cache-Control'] = 'public, max-age=31556926'
   load_search
   redirect "/movie/#{@movies.first.imdb_id}" if @movies.length == 1
   erb :index
 end
 
 get '/movie/:imdb_id' do
-  response.headers['Cache-Control'] = 'public, max-age=31556926'
   load_search
   @movie = Search.new("imdb_id" => params[:imdb_id]).results.first
   erb :movie
 end
 
 get '/add' do
-  response.headers['Cache-Control'] = 'public, max-age=31556926'
   load_search
   erb :add
 end
@@ -205,6 +210,12 @@ post '/create' do
   movie = Movie.add!(params[:imdb_id])
   redirect_url = movie ? "/movie/#{params[:imdb_id]}" : "/add"
   redirect redirect_url
+end
+
+delete '/delete/:imdb_id' do
+  @movie = Search.new("imdb_id" => params[:imdb_id]).results.first
+  @movie.delete!
+  redirect "/"
 end
 
 def load_search

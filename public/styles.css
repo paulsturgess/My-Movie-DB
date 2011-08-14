@@ -3,10 +3,11 @@ body{font: 1em Arial,Helvetica,sans-serif; color: #000;}
 
 #header_container{width:100%; background:#000; overflow:hidden; height:50px; position:fixed;}
 #header{color:#FFF; width:990px; margin:0 auto;}
-form{margin:15px auto 0; width:790px; }
+form{margin:15px auto 0; width:911px; }
 #search_year{width:50px;}
 #search_duration{width:130px;}
-input, select{margin:0 15px 0 0;}
+#search_certification{width:70px;}
+input, select{margin:0 12px 0 0;}
 #search_button{margin:0;}
 label{font-size:0.7em;}
 

@@ -7,7 +7,7 @@ include ERB::Util # Make url encode methods available
 class Search
   
   def self.attributes 
-    [:year, :name, :imdb_id, :genre, :all, :duration]
+    [:year, :name, :imdb_id, :genre, :all, :duration, :certification]
   end
   
   self.attributes.each do |attribute|
@@ -26,6 +26,7 @@ class Search
     conditions << "name:#{name}" if name.present?
     conditions << "imdb_id:#{imdb_id}" if imdb_id.present?
     conditions << "genres:#{genre}" if genre.present?
+    conditions << "certification:#{certification}" if certification.present?
     conditions = ["all:true"] if all.present? || conditions.empty?
     conditions.join(" ")
   end
@@ -168,6 +169,10 @@ class Movie
     attrs
   end
   
+  def self.certifications
+    ["G", "PG", "PG-13", "NC-17", "R"]
+  end
+  
   def self.genres
     ["Action", "Adventure", "Animation", "Comedy", "Crime", "Disaster", "Documentary", "Drama", "Eastern", "Family", "Fantasy", "History", "Holiday", "Horror", "Musical", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western"].sort
   end
@@ -219,6 +224,7 @@ delete '/delete/:imdb_id' do
 end
 
 def load_search
+  @certifications = Movie.certifications
   @genres = Movie.genres
   @durations = Movie.durations
   @search = Search.new(params[:search] || {"all" => true})

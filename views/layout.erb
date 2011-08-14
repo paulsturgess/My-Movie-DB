@@ -30,6 +30,13 @@
           <option value="<%= genre %>" <%= "selected='selected'" if genre == @search.genre %>><%= genre %></option>
           <% end %>
         </select>
+        <label for="search_certification">Certification:</label>
+        <select id="search_certification" name="search[certification]">
+          <option value=""></option>
+          <% @certifications.each do |certification| %>
+            <option value="<%= certification %>" <%= "selected='selected'" if certification == @search.certification %>><%= certification %></option>
+          <% end %>
+        </select>
         <input type="submit" value="Search" id="search_button" />
       </form>
 
